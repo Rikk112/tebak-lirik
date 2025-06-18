@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Tebak Lirik Lagu</title>
+</head>
+<body>
+  <h1>Tebak Lirik Lagu</h1>
+  <p id="soal">Memuat soal...</p>
+  <input type="text" id="jawaban" placeholder="Masukkan jawaban">
+  <button onclick="cekJawaban()">Kirim</button>
+  <p id="hasil"></p>
+
+  <script>
+    let soalSekarang = "";
+
+    async function ambilSoal() {
+      const res = await fetch('/get_soal');
+      const data = await res.json();
+      soalSekarang = data.soal;
+      document.getElementById('soal').innerText = data.soal;
+    }
+
+    async function cekJawaban() {
+      const jawaban = document.getElementById('jawaban').value;
+      const res = await fetch('/cek_jawaban', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ soal: soalSekarang, jawaban: jawaban })
+      });
+      const data = await res.json();
+      document.getElementById('hasil').innerText = data.benar
+        ? "Benar! 🎉"
+        : `Salah. Jawaban yang benar: "${data.jawaban_benar}"`;
+      ambilSoal();
+    }
+
+    ambilSoal();
+  </script>
+</body>
+</html>
